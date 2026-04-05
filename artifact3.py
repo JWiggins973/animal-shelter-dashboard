@@ -1,0 +1,290 @@
+# Program:  cs340AnimalShelterDashBoard.py
+# Author:   Jermaine Wiggins
+# Date:     2025
+# Purpose:  Dash-based web dashboard for the Grazioso Salvare animal shelter.
+#           Connects to a MongoDB database through the AnimalShelter CRUD module,
+#           displays animal rescue data in an interactive table, pie chart, and map,
+#           and allows filtering by rescue type using a dropdown menu.
+
+# Dash and layout imports
+from dash import Dash
+import dash_leaflet as dl
+from dash import dcc
+from dash import html
+import plotly.express as px
+from dash import dash_table
+from dash.dependencies import Input, Output
+
+# Data manipulation imports
+import numpy as np
+import pandas as pd
+
+# Local CRUD module
+from crudModule import AnimalShelter
+
+###########################
+# Data Manipulation / Model
+###########################
+
+# Initialize the database connection using the AnimalShelter CRUD module.
+# Credentials are managed inside the module.
+db = AnimalShelter()
+
+# Load all animals from the database into a DataFrame for the initial table render.
+# The _id column is dropped because MongoDB's ObjectId type is not JSON serializable
+# and will cause the Dash DataTable to crash if left in.
+df = pd.DataFrame.from_records(db.read({}))
+df.drop(columns=["_id"], inplace=True)
+
+# Column index constants for the map and tooltip callbacks.
+# Using named constants instead of magic numbers makes the code easier to read
+# and maintain if column positions ever change.
+BREED_COL = 4  # Column index for breed
+NAME_COL = 9  # Column index for animal name
+LAT_COL = 13  # Column index for latitude
+LON_COL = 14  # Column index for longitude
+
+# Rescue type filter queries defined once at module level so they are not
+# recreated every time the dropdown callback fires.
+# Each query targets dogs meeting the breed, sex, and age criteria for
+# a specific rescue role as defined by Grazioso Salvare.
+TRACKING_FILTER = {
+    "animal_type": "Dog",
+    "breed": {
+        "$in": [
+            "Doberman Pinscher",
+            "German Shepherd",
+            "Golden Retriever",
+            "Bloodhound",
+            "Rottweiler",
+        ]
+    },
+    "sex_upon_outcome": "Intact Male",
+    "age_upon_outcome_in_weeks": {"$gte": 20, "$lte": 300},
+}
+
+WATER_RESCUE_FILTER = {
+    "animal_type": "Dog",
+    "breed": {
+        "$in": [
+            "Labrador Retriever Mix",
+            "Chesa Bay Retr Mix",
+            "Newfoundland",
+            "Portuguese Water Dog",
+        ]
+    },
+    "sex_upon_outcome": "Intact Female",
+    "age_upon_outcome_in_weeks": {"$gte": 26, "$lte": 156},
+}
+
+MOUNTAIN_RESCUE_FILTER = {
+    "animal_type": "Dog",
+    "breed": {
+        "$in": [
+            "German Shepherd",
+            "Alaskan Malamute",
+            "Old English Sheepdog",
+            "Rottweiler",
+        ]
+    },
+    "sex_upon_outcome": "Intact Male",
+    "age_upon_outcome_in_weeks": {"$gte": 26, "$lte": 156},
+}
+
+#########################
+# Dashboard Layout / View
+#########################
+
+app = Dash("SimpleExample")
+
+app.layout = html.Div(
+    [
+        html.Div(id="hidden-div", style={"display": "none"}),
+        # Logo and title
+        html.Center(
+            html.Img(
+                src="/assets/Grazioso Salvare Logo.png",
+                style={"width": "300px", "height": "auto"},
+            )
+        ),
+        html.Center(html.B(html.H1("SNHU CS-340 Dashboard"))),
+        html.H3("Created by: Jermaine Wiggins"),
+        html.Hr(),
+        # Rescue type dropdown filter
+        html.Div(
+            [
+                dcc.Dropdown(
+                    id="dropdown",
+                    options=["Tracking", "Water Rescue", "Mountain Rescue"],
+                )
+            ]
+        ),
+        # Interactive data table displaying animal records
+        dash_table.DataTable(
+            id="datatable-id",
+            columns=[
+                {"name": i, "id": i, "deletable": False, "selectable": True}
+                for i in df.columns
+            ],
+            data=df.to_dict("records"),
+            editable=False,
+            filter_action="native",
+            sort_action="native",
+            sort_mode="multi",
+            column_selectable=False,
+            row_selectable="single",
+            selected_columns=[],
+            selected_rows=[0],
+            page_action="native",
+            page_current=0,
+            page_size=10,
+        ),
+        html.Br(),
+        html.Hr(),
+        # Breed pie chart and map displayed side by side
+        html.Div(
+            children=[
+                html.H4("Rescue Animals Breed"),
+                dcc.Graph(
+                    id="graph", style={"display": "inline-block", "width": "43%"}
+                ),
+                html.Div(
+                    id="map-id", style={"display": "inline-block", "width": "45%"}
+                ),
+            ]
+        ),
+    ]
+)
+
+#############################################
+# Interaction Between Components / Controller
+#############################################
+
+
+@app.callback(Output("datatable-id", "data"), Input("dropdown", "value"))
+def dropdown_output(value):
+    """Filter the data table based on the selected rescue type.
+
+    If no filter is selected, all animals are shown.
+    Otherwise the table is filtered using the matching rescue query.
+    """
+    # Reload all records from the database on each dropdown change
+    df = pd.DataFrame.from_records(db.read({}))
+    if "_id" in df.columns:
+        df.drop(columns=["_id"], inplace=True)
+
+    # Return all records if no filter is selected
+    if not value:
+        return df.to_dict("records")
+
+    # Match the dropdown selection to the appropriate filter query
+    filters = []
+    if "Tracking" in value:
+        filters.append(TRACKING_FILTER)
+    elif "Water Rescue" in value:
+        filters.append(WATER_RESCUE_FILTER)
+    elif "Mountain Rescue" in value:
+        filters.append(MOUNTAIN_RESCUE_FILTER)
+
+    # Apply the filter query or return all records if no match found
+    query = {"$or": filters} if filters else {}
+    df = pd.DataFrame.from_records(db.read(query))
+    if "_id" in df.columns:
+        df.drop(columns=["_id"], inplace=True)
+
+    return df.to_dict("records")
+
+
+@app.callback(
+    Output("datatable-id", "style_data_conditional"),
+    [Input("datatable-id", "selected_columns")],
+)
+def update_styles(selected_columns):
+    """Highlight selected columns in the data table with a light blue background."""
+    return [
+        {"if": {"column_id": i}, "background_color": "#D2F3FF"}
+        for i in selected_columns
+    ]
+
+
+@app.callback(
+    Output("map-id", "children"),
+    [
+        Input("datatable-id", "derived_virtual_data"),
+        Input("datatable-id", "derived_virtual_selected_rows"),
+    ],
+)
+def update_map(viewData, index):
+    """Update the Leaflet map to show the location of the selected animal.
+
+    Centers the marker on the selected row's latitude and longitude,
+    and displays the animal's breed in the tooltip and name in the popup.
+    """
+    try:
+        dff = pd.DataFrame.from_dict(viewData)
+        if dff.empty:
+            return []
+
+        # Default to the first row if no row is selected
+        row = index[0] if index else 0
+
+        return [
+            dl.Map(
+                style={"width": "1000px", "height": "500px"},
+                center=[30.75, -97.48],
+                zoom=10,
+                children=[
+                    dl.TileLayer(id="base-layer-id"),
+                    dl.Marker(
+                        position=[dff.iloc[row, LAT_COL], dff.iloc[row, LON_COL]],
+                        children=[
+                            dl.Tooltip(dff.iloc[row, BREED_COL]),
+                            dl.Popup(
+                                [
+                                    html.H1("Animal Name"),
+                                    html.P(dff.iloc[row, NAME_COL]),
+                                ]
+                            ),
+                        ],
+                    ),
+                ],
+            )
+        ]
+    except Exception as e:
+        print(f"Error in update_map: {e}")
+        return []
+
+
+@app.callback(
+    Output("graph", "figure"),
+    Input("datatable-id", "derived_virtual_data"),
+)
+def generate_chart(viewData):
+    """Generate a pie chart showing breed distribution of the currently visible animals.
+
+    Breeds making up less than 1% of the total are grouped into an 'Other' slice
+    to keep the chart readable when many breeds are present.
+    """
+    if not viewData:
+        return {}
+
+    dff = pd.DataFrame.from_dict(viewData)
+    counts = dff["breed"].value_counts()
+    total = counts.sum()
+
+    # Group breeds below 1% of total into an 'Other' category for readability
+    threshold = total * 0.01
+    breeds_above_threshold = counts[counts >= threshold].copy()
+    breeds_below_threshold = counts[counts < threshold].sum()
+
+    if breeds_below_threshold > 0:
+        breeds_above_threshold["Other"] = breeds_below_threshold
+
+    new_dff = breeds_above_threshold.reset_index()
+    new_dff.columns = ["breed", "count"]
+
+    fig = px.pie(new_dff, values="count", names="breed", hole=0.3)
+    return fig
+
+
+app.run(debug=True)
