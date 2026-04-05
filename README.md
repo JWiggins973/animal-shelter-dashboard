@@ -20,7 +20,13 @@ Coming Soon
 
 ## ▶️ How to Run
 
-**1. Start the Docker container**
+**1. Get the Docker container**
+This project uses the `moonlitaltar/cs340` Docker image provided by SNHU. If you don't have it yet pull and run it:
+```bash
+docker pull moonlitaltar/cs340
+docker run -d -p 27017:27017 --name cs340 moonlitaltar/cs340
+```
+If you already have it just start it:
 ```bash
 docker start cs340
 ```
@@ -30,7 +36,7 @@ docker start cs340
 source venv/bin/activate
 ```
 
-**3. Create your .env file** — required, never committed to GitHub
+**3. Create your .env file** — this is required and never committed to GitHub
 ```
 MONGO_USER=your_username
 MONGO_PASS=your_password
