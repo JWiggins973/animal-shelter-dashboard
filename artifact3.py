@@ -1,10 +1,11 @@
-# Program:  cs340AnimalShelterDashBoard.py
+# Program:  artifact3.py
 # Author:   Jermaine Wiggins
 # Date:     2025
 # Purpose:  Dash-based web dashboard for the Grazioso Salvare animal shelter.
 #           Connects to a MongoDB database through the AnimalShelter CRUD module,
 #           displays animal rescue data in an interactive table, pie chart, and map,
 #           and allows filtering by rescue type using a dropdown menu.
+#           Includes a summary stats bar using the count method from crudModule.
 
 # Dash and layout imports
 from dash import Dash
@@ -16,6 +17,7 @@ from dash import dash_table
 from dash.dependencies import Input, Output
 
 # Data manipulation imports
+import time
 import numpy as np
 import pandas as pd
 
@@ -36,6 +38,12 @@ db = AnimalShelter()
 df = pd.DataFrame.from_records(db.read({}))
 df.drop(columns=["_id"], inplace=True)
 
+# Summary stats using the count method from Enhancement 3.
+# These are computed once at startup and displayed in the stats bar.
+TOTAL_ANIMALS = db.count({})
+TOTAL_DOGS = db.count({"animal_type": "Dog"})
+TOTAL_CATS = db.count({"animal_type": "Cat"})
+
 # Column index constants for the map and tooltip callbacks.
 # Using named constants instead of magic numbers makes the code easier to read
 # and maintain if column positions ever change.
@@ -46,8 +54,6 @@ LON_COL = 14  # Column index for longitude
 
 # Rescue type filter queries defined once at module level so they are not
 # recreated every time the dropdown callback fires.
-# Each query targets dogs meeting the breed, sex, and age criteria for
-# a specific rescue role as defined by Grazioso Salvare.
 TRACKING_FILTER = {
     "animal_type": "Dog",
     "breed": {
@@ -95,6 +101,18 @@ MOUNTAIN_RESCUE_FILTER = {
 # Dashboard Layout / View
 #########################
 
+# Reusable style for each stat card in the summary bar
+CARD_STYLE = {
+    "display": "inline-block",
+    "width": "22%",
+    "margin": "0 1%",
+    "padding": "16px",
+    "backgroundColor": "#f9f9f9",
+    "borderRadius": "8px",
+    "textAlign": "center",
+    "boxShadow": "0 1px 4px rgba(0,0,0,0.1)",
+}
+
 app = Dash("SimpleExample")
 
 app.layout = html.Div(
@@ -109,6 +127,58 @@ app.layout = html.Div(
         ),
         html.Center(html.B(html.H1("SNHU CS-340 Dashboard"))),
         html.H3("Created by: Jermaine Wiggins"),
+        html.Hr(),
+        # Summary stats bar — uses count method from Enhancement 3.
+        # Updates dynamically when the rescue type filter changes.
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.H2(
+                            id="stat-total",
+                            children=str(TOTAL_ANIMALS),
+                            style={"margin": "0", "color": "#2c7bb6"},
+                        ),
+                        html.P("Total Animals", style={"margin": "4px 0 0"}),
+                    ],
+                    style=CARD_STYLE,
+                ),
+                html.Div(
+                    [
+                        html.H2(
+                            id="stat-dogs",
+                            children=str(TOTAL_DOGS),
+                            style={"margin": "0", "color": "#2c7bb6"},
+                        ),
+                        html.P("Dogs", style={"margin": "4px 0 0"}),
+                    ],
+                    style=CARD_STYLE,
+                ),
+                html.Div(
+                    [
+                        html.H2(
+                            id="stat-cats",
+                            children=str(TOTAL_CATS),
+                            style={"margin": "0", "color": "#2c7bb6"},
+                        ),
+                        html.P("Cats", style={"margin": "4px 0 0"}),
+                    ],
+                    style=CARD_STYLE,
+                ),
+                html.Div(
+                    [
+                        html.H2(
+                            id="stat-querytime",
+                            children="--",
+                            style={"margin": "0", "color": "#2c7bb6"},
+                        ),
+                        html.P("Query time (ms)", style={"margin": "4px 0 0"}),
+                    ],
+                    style=CARD_STYLE,
+                ),
+            ],
+            style={"textAlign": "center", "margin": "20px 0"},
+        ),
         html.Hr(),
         # Rescue type dropdown filter
         html.Div(
@@ -161,38 +231,55 @@ app.layout = html.Div(
 #############################################
 
 
-@app.callback(Output("datatable-id", "data"), Input("dropdown", "value"))
+@app.callback(
+    Output("datatable-id", "data"),
+    Output("stat-total", "children"),
+    Output("stat-dogs", "children"),
+    Output("stat-cats", "children"),
+    Output("stat-querytime", "children"),
+    Input("dropdown", "value"),
+)
 def dropdown_output(value):
-    """Filter the data table based on the selected rescue type.
+    """Filter the data table and update summary stats based on the selected rescue type.
 
-    If no filter is selected, all animals are shown.
-    Otherwise the table is filtered using the matching rescue query.
+    If no filter is selected, all animals are shown and stats reflect the full dataset.
+    Otherwise the table and stats are filtered using the matching rescue query.
+    Query time is measured and displayed to demonstrate the performance benefit of indexing.
     """
-    # Reload all records from the database on each dropdown change
-    df = pd.DataFrame.from_records(db.read({}))
-    if "_id" in df.columns:
-        df.drop(columns=["_id"], inplace=True)
-
-    # Return all records if no filter is selected
     if not value:
-        return df.to_dict("records")
+        query = {}
+    else:
+        filters = []
+        if "Tracking" in value:
+            filters.append(TRACKING_FILTER)
+        elif "Water Rescue" in value:
+            filters.append(WATER_RESCUE_FILTER)
+        elif "Mountain Rescue" in value:
+            filters.append(MOUNTAIN_RESCUE_FILTER)
+        query = {"$or": filters} if filters else {}
 
-    # Match the dropdown selection to the appropriate filter query
-    filters = []
-    if "Tracking" in value:
-        filters.append(TRACKING_FILTER)
-    elif "Water Rescue" in value:
-        filters.append(WATER_RESCUE_FILTER)
-    elif "Mountain Rescue" in value:
-        filters.append(MOUNTAIN_RESCUE_FILTER)
-
-    # Apply the filter query or return all records if no match found
-    query = {"$or": filters} if filters else {}
+    # Time the database query to show indexing performance
+    start = time.time()
     df = pd.DataFrame.from_records(db.read(query))
+    elapsed_ms = round((time.time() - start) * 1000, 1)
+
     if "_id" in df.columns:
         df.drop(columns=["_id"], inplace=True)
 
-    return df.to_dict("records")
+    # Update stat counts to reflect the current filter
+    total = db.count(query)
+    dogs = (
+        db.count({**query, "animal_type": "Dog"})
+        if query
+        else db.count({"animal_type": "Dog"})
+    )
+    cats = (
+        db.count({**query, "animal_type": "Cat"})
+        if query
+        else db.count({"animal_type": "Cat"})
+    )
+
+    return df.to_dict("records"), str(total), str(dogs), str(cats), f"{elapsed_ms}ms"
 
 
 @app.callback(
@@ -215,17 +302,12 @@ def update_styles(selected_columns):
     ],
 )
 def update_map(viewData, index):
-    """Update the Leaflet map to show the location of the selected animal.
-
-    Centers the marker on the selected row's latitude and longitude,
-    and displays the animal's breed in the tooltip and name in the popup.
-    """
+    """Update the Leaflet map to show the location of the selected animal."""
     try:
         dff = pd.DataFrame.from_dict(viewData)
         if dff.empty:
             return []
 
-        # Default to the first row if no row is selected
         row = index[0] if index else 0
 
         return [
@@ -260,7 +342,7 @@ def update_map(viewData, index):
     Input("datatable-id", "derived_virtual_data"),
 )
 def generate_chart(viewData):
-    """Generate a pie chart showing breed distribution of the currently visible animals.
+    """Generate a pie chart showing breed distribution of currently visible animals.
 
     Breeds making up less than 1% of the total are grouped into an 'Other' slice
     to keep the chart readable when many breeds are present.
