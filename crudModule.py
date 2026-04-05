@@ -30,21 +30,26 @@ class AnimalShelter(object):
         self.database = self.client[DB]
         self.collection = self.database[COL]
 
+        # Add indexes on filtered fields so queries run in O(log n) instead of O(n).
+        # Checks existing indexes first so duplicates are never created on restart.
+        existing_indexes = self.collection.index_information()
+
+        if "animal_type_1" not in existing_indexes:
+            self.collection.create_index("animal_type", name="animal_type_1")
+
+        if "breed_1" not in existing_indexes:
+            self.collection.create_index("breed", name="breed_1")
+
+        if "animal_type_1_breed_1" not in existing_indexes:
+            self.collection.create_index(
+                [("animal_type", 1), ("breed", 1)], name="animal_type_1_breed_1"
+            )
+
     # ------------------------------------------------------------
-    # CREATE - Insert a single document into the collection
+    # CREATE
     # ------------------------------------------------------------
     def create(self, data):
-        """Insert one document into the animals collection.
-
-        Args:
-            data (dict): The document to insert. Must be a non-empty dictionary.
-
-        Returns:
-            bool: True if the insert succeeded.
-
-        Raises:
-            Exception: If data is None or empty.
-        """
+        """Insert one document into the collection. Returns True on success."""
         if data is not None:
             self.collection.insert_one(data)
             return True
@@ -52,20 +57,10 @@ class AnimalShelter(object):
             raise Exception("Nothing to save, because data parameter is empty")
 
     # ------------------------------------------------------------
-    # READ - Query documents from the collection
+    # READ
     # ------------------------------------------------------------
     def read(self, query):
-        """Find and return documents matching the given query.
-
-        Args:
-            query (dict): A MongoDB query dictionary. Pass {} to return all documents.
-
-        Returns:
-            list: A list of matching documents.
-
-        Raises:
-            Exception: If query is None.
-        """
+        """Query the collection and return matching documents as a list."""
         if query is not None:
             results = self.collection.find(query)
             return list(results)
@@ -73,23 +68,11 @@ class AnimalShelter(object):
             raise Exception("Nothing to read, because query parameter is empty")
 
     # ------------------------------------------------------------
-    # UPDATE - Modify one or many documents in the collection
+    # UPDATE
     # ------------------------------------------------------------
     def update(self, query, updated_data, many=False):
-        """Update one or more documents matching the given query.
-
-        Args:
-            query (dict):        A MongoDB query dictionary to match documents.
-            updated_data (dict): The update operations to apply (e.g. {"$set": {...}}).
-            many (bool):         If True, update all matching documents.
-                                 If False (default), update only the first match.
-
-        Returns:
-            int: The number of documents modified.
-
-        Raises:
-            Exception: If query or updated_data is None.
-        """
+        """Update matching documents. Set many=True to update all matches.
+        Returns the number of documents modified."""
         if query is not None and updated_data is not None:
             if many:
                 results = self.collection.update_many(query, updated_data)
@@ -100,22 +83,11 @@ class AnimalShelter(object):
             raise Exception("Please provide both a query and update data")
 
     # ------------------------------------------------------------
-    # DELETE - Remove one or many documents from the collection
+    # DELETE
     # ------------------------------------------------------------
     def delete(self, query, many=False):
-        """Delete one or more documents matching the given query.
-
-        Args:
-            query (dict): A MongoDB query dictionary to match documents.
-            many (bool):  If True, delete all matching documents.
-                          If False (default), delete only the first match.
-
-        Returns:
-            int: The number of documents deleted.
-
-        Raises:
-            Exception: If query is None.
-        """
+        """Delete matching documents. Set many=True to delete all matches.
+        Returns the number of documents deleted."""
         if query is not None:
             if many:
                 results = self.collection.delete_many(query)
