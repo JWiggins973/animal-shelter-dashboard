@@ -21,9 +21,8 @@ class AnimalShelter(object):
         DB = "AAC"
         COL = "animals"
 
-        # Initialize the MongoDB client and connect to the animals collection.
-        # authSource=admin tells PyMongo to authenticate against the admin database,
-        # which is where the aacuser account is stored.
+        # Connect to MongoDB and select the animals collection.
+        # authSource=admin tells PyMongo where the user account is stored.
         self.client = MongoClient(
             "mongodb://%s:%s@%s:%d/?authSource=admin" % (USER, PASS, HOST, PORT)
         )
@@ -56,6 +55,14 @@ class AnimalShelter(object):
         else:
             raise Exception("Nothing to save, because data parameter is empty")
 
+    def create_many(self, data_list):
+        """Insert multiple documents at once. Returns True on success."""
+        if data_list is not None and len(data_list) > 0:
+            self.collection.insert_many(data_list)
+            return True
+        else:
+            raise Exception("Nothing to save, because data_list parameter is empty")
+
     # ------------------------------------------------------------
     # READ
     # ------------------------------------------------------------
@@ -67,17 +74,28 @@ class AnimalShelter(object):
         else:
             raise Exception("Nothing to read, because query parameter is empty")
 
+    def count(self, query):
+        """Return the number of documents matching the query."""
+        if query is not None:
+            return self.collection.count_documents(query)
+        else:
+            raise Exception("Nothing to count, because query parameter is empty")
+
     # ------------------------------------------------------------
     # UPDATE
     # ------------------------------------------------------------
-    def update(self, query, updated_data, many=False):
-        """Update matching documents. Set many=True to update all matches.
-        Returns the number of documents modified."""
+    def update(self, query, updated_data):
+        """Update the first document matching the query. Returns the number of documents modified."""
         if query is not None and updated_data is not None:
-            if many:
-                results = self.collection.update_many(query, updated_data)
-            else:
-                results = self.collection.update_one(query, updated_data)
+            results = self.collection.update_one(query, updated_data)
+            return results.modified_count
+        else:
+            raise Exception("Please provide both a query and update data")
+
+    def update_many(self, query, updated_data):
+        """Update all documents matching the query. Returns the number of documents modified."""
+        if query is not None and updated_data is not None:
+            results = self.collection.update_many(query, updated_data)
             return results.modified_count
         else:
             raise Exception("Please provide both a query and update data")
@@ -85,14 +103,18 @@ class AnimalShelter(object):
     # ------------------------------------------------------------
     # DELETE
     # ------------------------------------------------------------
-    def delete(self, query, many=False):
-        """Delete matching documents. Set many=True to delete all matches.
-        Returns the number of documents deleted."""
+    def delete(self, query):
+        """Delete the first document matching the query. Returns the number of documents deleted."""
         if query is not None:
-            if many:
-                results = self.collection.delete_many(query)
-            else:
-                results = self.collection.delete_one(query)
+            results = self.collection.delete_one(query)
+            return results.deleted_count
+        else:
+            raise Exception("Please provide a query to delete documents")
+
+    def delete_many(self, query):
+        """Delete all documents matching the query. Returns the number of documents deleted."""
+        if query is not None:
+            results = self.collection.delete_many(query)
             return results.deleted_count
         else:
             raise Exception("Please provide a query to delete documents")
