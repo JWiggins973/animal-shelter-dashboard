@@ -5,21 +5,31 @@
 #           (Create, Read, Update, Delete) for the AAC animals collection
 #           in MongoDB. Used by the CS340 animal shelter dashboard.
 
+import os
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file so credentials
+# are never hardcoded in the source code.
+load_dotenv()
 
 
 class AnimalShelter(object):
     """CRUD operations for the Animal collection in MongoDB."""
 
     def __init__(self):
-        # Connection variables for the MongoDB instance
-        USER = "aacuser"
-        PASS = "SNHU1234"
-        HOST = "localhost"
-        PORT = 27017
-        DB = "AAC"
-        COL = "animals"
+        # Load credentials from environment variables.
+        # Raises a clear error if any required variable is missing.
+        USER = os.environ.get("MONGO_USER")
+        PASS = os.environ.get("MONGO_PASS")
+        HOST = os.environ.get("MONGO_HOST", "localhost")
+        PORT = int(os.environ.get("MONGO_PORT", 27017))
+        DB = os.environ.get("MONGO_DB", "AAC")
+        COL = os.environ.get("MONGO_COL", "animals")
+
+        if not USER or not PASS:
+            raise Exception("MONGO_USER and MONGO_PASS must be set in the .env file")
 
         # Connect to MongoDB and select the animals collection.
         # authSource=admin tells PyMongo where the user account is stored.

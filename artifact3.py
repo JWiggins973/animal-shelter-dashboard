@@ -27,7 +27,7 @@ from crudModule import AnimalShelter
 ###########################
 
 # Initialize the database connection using the AnimalShelter CRUD module.
-# Credentials are managed inside the module.
+# Credentials are loaded from the .env file inside the module.
 db = AnimalShelter()
 
 # Load all animals from the database into a DataFrame for the initial table render.
