@@ -1,19 +1,21 @@
 # 🐾 Animal Shelter Dashboard
 
-Filter and interact with animal rescue data for Grazioso Salvare. Built with Python, MongoDB, and Dash — featuring live stats, rescue type filtering, an interactive map, and breed distribution chart.
+Filter and interact with animal rescue data for Grazioso Salvare. Built with Python, Flask, MongoDB, and vanilla JavaScript — featuring live stats, rescue type filtering, an interactive map, and a breed distribution chart.
 
-> The base dashboard code was provided by Southern New Hampshire University as part of CS340 Client/Server Development. The CRUD module (`crudModule.py`) and all enhancements listed above were implemented by Jermaine Wiggins.
+> The base dashboard code was provided by Southern New Hampshire University as part of CS340 Client/Server Development. The CRUD module (`crudModule.py`) and all enhancements listed below were implemented by Jermaine Wiggins.
 
 ## 📁 Original Artifact
-The original version is on the `main` branch.
+The original Dash-based version is on the `main` branch.
 
 ## ⚡ Enhancements - Client/Server Development
 
-* 🧹 Cleaned up comments, removed dead code, and added named constants throughout
+* 🔄 Migrated from Dash to a custom Flask REST API with a vanilla JavaScript frontend
+* 🧩 Built a reusable dashboard engine — swap `config.js` to use it with any MongoDB collection
 * 🗄️ Added database indexes on `animal_type` and `breed` — improving query time from O(n) to O(log n)
 * 🔧 Expanded CRUD module with `count`, `create_many`, `update_many`, and `delete_many` methods
 * 🔒 Moved hardcoded credentials to a `.env` file using `python-dotenv`
 * 📊 Added a live stats bar showing total animals, dogs, cats, and query time in milliseconds
+* 📋 Added sortable, searchable, paginated table with rescue type and column filters
 
 ## 📸 Preview
 Coming Soon
@@ -21,12 +23,13 @@ Coming Soon
 ## ▶️ How to Run
 
 **1. Get the Docker container**
-This project uses the `moonlitaltar/cs340` Docker image provided by SNHU. If you don't have it yet pull and run it:
+
+This project uses the `moonlitaltar/cs340` Docker image provided by SNHU. If you don't have it yet:
 ```bash
 docker pull moonlitaltar/cs340
 docker run -d -p 27017:27017 --name cs340 moonlitaltar/cs340
 ```
-If you already have it just start it:
+If you already have it:
 ```bash
 docker start cs340
 ```
@@ -36,7 +39,7 @@ docker start cs340
 source venv/bin/activate
 ```
 
-**3. Create your .env file** — this is required and never committed to GitHub
+**3. Create your `.env` file** — required, never committed to GitHub
 ```
 MONGO_USER=your_username
 MONGO_PASS=your_password
@@ -46,12 +49,12 @@ MONGO_DB=AAC
 MONGO_COL=animals
 ```
 
-**4. Run the dashboard**
+**4. Run the server**
 ```bash
-python artifact3.py
+python server.py
 ```
 
-Open your browser → `http://127.0.0.1:8050`
+Open your browser → `http://127.0.0.1:5000`
 
 ## ✍️ Author
 Jermaine Wiggins | Southern New Hampshire University | CS340 Client/Server Development
