@@ -1,23 +1,7 @@
-# Virtual environment
-venv/
-env/
-
-# Python cache
+.env
 __pycache__/
 *.pyc
 *.pyo
-
-# Environment variables
-.env
-
-# Jupyter checkpoints
-.ipynb_checkpoints/
-
-# VS Code
-.vscode/
-
-# Mac system files
 .DS_Store
-
-# MongoDB
-*.log
+.ipynb_checkpoints/
+venv/

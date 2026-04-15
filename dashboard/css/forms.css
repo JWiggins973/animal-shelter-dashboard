@@ -1,0 +1,94 @@
+/* forms.css
+   Author: Jermaine Wiggins
+   Date:   2025
+   Purpose: Add and delete form layouts, result cards, and confirm banner.
+*/
+
+/* FORMS. */
+.page-title { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+.page-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+/* Two column grid for form fields. */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.form-input {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+}
+
+.form-actions { margin-top: 24px; display: flex; gap: 10px; }
+
+/* DELETE VIEW. */
+.delete-search-box {
+  display: flex;
+  gap: 10px;
+  max-width: 500px;
+  margin-bottom: 24px;
+}
+
+.delete-search-box input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.delete-search-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Result card shown after searching. */
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  max-width: 500px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+
+.result-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.result-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+/* Red warning banner before confirming delete. */
+.confirm-banner {
+  background: var(--danger-light);
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--danger);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.action-row { display: flex; gap: 10px; }

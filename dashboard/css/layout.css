@@ -1,0 +1,84 @@
+/* layout.css
+   Author: Jermaine Wiggins
+   Date:   2025
+   Purpose: Header, nav, and main content area layout.
+*/
+
+/* HEADER -- sticky so it stays visible when scrolling. */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+/* Left side of the header. */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Logo mark. */
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+
+.site-name { font-size: 15px; font-weight: 600; }
+.header-center { font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace; }
+.header-right { font-size: 13px; color: var(--muted); }
+
+/* NAV. */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  gap: 4px;
+}
+
+/* Nav buttons. */
+.nav-btn {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+
+/* Hover state. */
+.nav-btn:hover { color: var(--text); }
+
+/* Active tab. */
+.nav-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* MAIN CONTENT AREA. */
+main {
+  padding: 28px 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}

@@ -1,0 +1,62 @@
+/* components.css
+   Author: Jermaine Wiggins
+   Date:   2025
+   Purpose: Buttons, toast messages, and loading state.
+*/
+
+/* BUTTONS. */
+.btn {
+  padding: 9px 20px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+/* Primary -- blue fill. */
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+
+/* Danger -- red fill for delete. */
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #b91c1c; }
+
+/* Ghost -- transparent with border. */
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: var(--text); }
+
+/* TOAST MESSAGES
+   Success and error messages that appear and disappear. */
+.toast {
+  border-radius: 7px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 16px;
+  display: none;
+}
+
+/* Green for success. */
+.toast-success {
+  background: var(--success-light);
+  border: 1px solid #bbf7d0;
+  color: var(--success);
+}
+
+/* Red for errors. */
+.toast-error {
+  background: var(--danger-light);
+  border: 1px solid #fecaca;
+  color: var(--danger);
+}
+
+/* Loading state shown while data is fetching. */
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
