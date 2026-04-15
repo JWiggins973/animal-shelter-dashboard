@@ -182,7 +182,7 @@ const CONFIG = {
   },
 
   // ── Mock Data ──────────────────────────────────────────────────────────────
-  // Optional. Set to an array to use local data instead of fetching from the API.
-  mockData: null,
+  // Set to MOCK_DATA for the GitHub Pages demo. Set to null to use the live API.
+  mockData: MOCK_DATA,
 
 };
