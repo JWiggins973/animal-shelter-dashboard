@@ -7,18 +7,21 @@ Filter and interact with animal rescue data for Grazioso Salvare. Built with Pyt
 ## 📁 Original Artifact
 The original Dash-based version is on the [`main` branch](https://github.com/JWiggins973/animal-shelter-dashboard/tree/main).
 
+## 🌐 Live Demo
+[View on GitHub Pages](https://jwiggins973.github.io/animal-shelter-dashboard/) — powered by 100 real records exported as mock data from the live database, no backend required.
+
 ## ⚡ Enhancements - Client/Server Development
 
-* 🔄 Migrated from Dash to a custom Flask REST API with a vanilla JavaScript frontend
-* 🧩 Built a reusable dashboard engine — swap `config.js` to use it with any MongoDB collection
-* 🗄️ Added database indexes on `animal_type` and `breed` — improving query time from O(n) to O(log n)
-* 🔧 Expanded CRUD module with `count`, `create_many`, `update_many`, and `delete_many` methods
-* 🔒 Moved hardcoded credentials to a `.env` file using `python-dotenv`
-* 📊 Added a live stats bar showing total animals, dogs, cats, and query time in milliseconds
-* 📋 Added sortable, searchable, paginated table with rescue type and column filters
-
-## 📸 Preview
-Coming Soon
+* Migrated from Dash to a custom Flask REST API with a vanilla JavaScript frontend
+* Built a reusable dashboard engine — swap `config.js` to use it with any MongoDB collection
+* Added database indexes on `animal_type` and `breed` — improving query time from O(n) to O(log n)
+* Expanded CRUD module with `count`, `create_many`, `update_many`, and `delete_many` methods
+* Moved hardcoded credentials to a `.env` file using `python-dotenv`
+* Added a live stats bar showing total animals, dogs, cats, and query time in milliseconds
+* Added sortable, searchable, paginated table with rescue type and column filters
+* Split backend into `service.py` (business logic) and `server.py` (HTTP routing)
+* Split frontend into focused modules — `api.js`, `table.js`, `filters.js`, `map.js`, `chart.js`, `forms.js`
+* Added query sanitization in `service.py` to block MongoDB operator injection
 
 ## ▶️ How to Run
 
@@ -51,7 +54,7 @@ MONGO_COL=animals
 
 **4. Run the server**
 ```bash
-python server.py
+python backend/server.py
 ```
 
 Open your browser → `http://127.0.0.1:5000`
