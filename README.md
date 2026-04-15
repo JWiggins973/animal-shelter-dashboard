@@ -5,7 +5,7 @@ Filter and interact with animal rescue data for Grazioso Salvare. Built with Pyt
 > The base dashboard code was provided by Southern New Hampshire University as part of CS340 Client/Server Development. The CRUD module (`crudModule.py`) and all enhancements listed below were implemented by Jermaine Wiggins.
 
 ## 📁 Original Artifact
-The original Dash-based version is on the `main` branch.
+The original Dash-based version is on the [`main` branch](https://github.com/JWiggins973/animal-shelter-dashboard/tree/main).
 
 ## ⚡ Enhancements - Client/Server Development
 
