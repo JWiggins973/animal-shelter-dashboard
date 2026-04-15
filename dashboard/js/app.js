@@ -63,29 +63,51 @@ function applyConfig() {
 // ── Data Loading ──────────────────────────────────────────────────────────────
 
 // Fetches total, dog, and cat counts and updates the stats bar.
+// When mockData is set, computes counts locally instead of hitting the API.
 async function loadStats() {
-  try {
-    const data = await api.getStats();
-    document.getElementById("stat-total").textContent = data.total.toLocaleString();
-    document.getElementById("stat-dogs").textContent  = data.dogs.toLocaleString();
-    document.getElementById("stat-cats").textContent  = data.cats.toLocaleString();
-  } catch (e) {
-    console.error("Failed to load stats:", e);
+  let total, dogs, cats;
+
+  if (CONFIG.mockData) {
+    total = CONFIG.mockData.length;
+    dogs  = CONFIG.mockData.filter(r => r.animal_type === "Dog").length;
+    cats  = CONFIG.mockData.filter(r => r.animal_type === "Cat").length;
+  } else {
+    try {
+      const data = await api.getStats();
+      total = data.total;
+      dogs  = data.dogs;
+      cats  = data.cats;
+    } catch (e) {
+      console.error("Failed to load stats:", e);
+      return;
+    }
   }
+
+  document.getElementById("stat-total").textContent = total.toLocaleString();
+  document.getElementById("stat-dogs").textContent  = dogs.toLocaleString();
+  document.getElementById("stat-cats").textContent  = cats.toLocaleString();
 }
 
 // Fetches animals matching the query and times the request.
+// When mockData is set, filters locally instead of hitting the API.
 async function loadData(query) {
   document.getElementById("table-body").innerHTML =
     `<tr><td colspan="${CONFIG.columns.length}" class="loading">Loading...</td></tr>`;
 
   const start = performance.now();
 
-  try {
-    allData = await api.filterAnimals(query);
-  } catch (e) {
-    console.error("Failed to load data:", e);
-    allData = [];
+  if (CONFIG.mockData) {
+    // Filter mock data locally using the same keys as the query.
+    allData = CONFIG.mockData.filter(row => {
+      return Object.entries(query).every(([k, v]) => row[k] === v);
+    });
+  } else {
+    try {
+      allData = await api.filterAnimals(query);
+    } catch (e) {
+      console.error("Failed to load data:", e);
+      allData = [];
+    }
   }
 
   // Show query time in the stats bar.
