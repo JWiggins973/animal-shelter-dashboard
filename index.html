@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Title set from CONFIG.title. -->
+  <title id="page-title">Dashboard</title>
+
+  <!-- Google Fonts. -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS. -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- Stylesheet. -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/table.css">
+  <link rel="stylesheet" href="css/chart-map.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+
+  <!-- HEADER -- text set from CONFIG by app.js. -->
+  <header>
+    <div class="header-left">
+      <div class="logo-mark" id="header-logo"></div>
+      <div class="site-name" id="header-title"></div>      <!-- CONFIG.title -->
+    </div>
+    <div class="header-center" id="header-subtitle"></div> <!-- CONFIG.subtitle -->
+    <div class="header-right" id="header-author"></div>    <!-- CONFIG.author -->
+  </header>
+
+  <!-- NAV -- buttons built from CONFIG.nav. -->
+  <nav id="main-nav"></nav>
+
+  <main>
+
+    <!-- DASHBOARD VIEW -->
+    <div class="view active" id="view-dashboard">
+
+      <!-- Stats bar -- values from the API. -->
+      <div class="stats-bar">
+        <div class="stat-card"><div class="stat-value" id="stat-total">--</div><div class="stat-label">Total Animals</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-dogs">--</div><div class="stat-label">Dogs</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-cats">--</div><div class="stat-label">Cats</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-query">--</div><div class="stat-label">Query Time</div></div>
+      </div>
+
+      <!-- Rescue filter -- options from CONFIG.rescueFilters. -->
+      <div class="rescue-row">
+        <span class="rescue-label">Rescue type:</span>
+        <select class="rescue-select" id="rescue-filter" onchange="applyRescueFilter()"></select>
+      </div>
+
+      <!-- Table -- headers from CONFIG.columns, rows from API data. -->
+      <div class="card">
+        <div class="card-header"><div class="dot"></div><span id="table-title"></span></div>
+        <div class="table-controls">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="search-input" type="text" id="table-search" placeholder="Search..." oninput="applyTableFilters()">
+          </div>
+          <!-- Filter dropdowns from CONFIG.filters. -->
+          <div id="filter-dropdowns"></div>
+          <button class="clear-btn" onclick="clearTableFilters()">Clear</button>
+          <span class="results-count" id="results-count">-- results</span>
+        </div>
+        <div class="table-wrapper">
+          <table id="main-table">
+            <thead id="table-head"></thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+      <!-- Chart and map side by side. -->
+      <div class="bottom-panels">
+
+        <!-- Breed distribution pie chart. -->
+        <div class="card">
+          <div class="card-header"><div class="dot"></div><span id="chart-title"></span></div>
+          <div class="card-body">
+            <!-- Chart.js canvas. -->
+            <canvas id="pie-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Animal location map. -->
+        <div class="card">
+          <div class="card-header"><div class="dot"></div><span id="map-title"></span></div>
+          <!-- Leaflet map. -->
+          <div id="map"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ADD ANIMAL VIEW -- title and subtitle from config.js. -->
+    <div class="view" id="view-add">
+      <div class="page-title" id="add-title"></div>
+      <div class="page-subtitle" id="add-subtitle"></div>
+      <div class="card" style="max-width:740px">
+        <div class="card-header"><div class="dot"></div><span id="add-form-title"></span></div>
+        <div class="card-body">
+          <!-- Form fields from CONFIG.addFields. -->
+          <div class="form-grid" id="add-form"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="submitAdd()">Add Animal</button>
+            <button class="btn btn-ghost" onclick="clearAddForm()">Clear</button>
+          </div>
+          <div class="toast toast-success" id="add-toast"></div>
+          <div class="toast toast-error"   id="add-error"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE ANIMAL VIEW -- title and subtitle from config.js. -->
+    <div class="view" id="view-delete">
+      <div class="page-title" id="delete-title"></div>
+      <div class="page-subtitle" id="delete-subtitle"></div>
+
+      <div class="delete-search-box">
+        <input type="text" id="delete-search" placeholder="Search...">
+        <button class="btn btn-primary" onclick="searchDelete()">Search</button>
+      </div>
+
+      <!-- Results injected here by app.js. -->
+      <div id="delete-results"></div>
+
+      <div class="toast toast-success" id="delete-toast"></div>
+    </div>
+
+  </main>
+
+  <!-- Third-party libraries. -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Load order matters: config first, api second, modules next, app last. -->
+  <!-- mockData.js contains 100 real records exported from the live MongoDB
+       database for the GitHub Pages demo. No backend required on this branch. -->
+  <script src="js/mockData.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/table.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/forms.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

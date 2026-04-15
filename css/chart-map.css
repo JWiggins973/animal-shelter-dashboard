@@ -1,0 +1,23 @@
+/* chart-map.css
+   Author: Jermaine Wiggins
+   Date:   2025
+   Purpose: Bottom panels layout, chart canvas, and map container.
+*/
+
+/* BOTTOM PANELS
+   Chart and map side by side below the table. */
+.bottom-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Chart. */
+#pie-chart { max-height: 280px; }
+
+/* Map container. */
+#map {
+  height: 300px;
+  width: 100%;
+}

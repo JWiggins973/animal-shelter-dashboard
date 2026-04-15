@@ -1,0 +1,40 @@
+/* base.css
+   Author: Jermaine Wiggins
+   Date:   2025
+   Purpose: Reset, CSS variables, body, and view visibility rules.
+*/
+
+/* Reset. */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* CSS variables -- change a color here and it updates everywhere. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --border: #e2e5ea;
+  --text: #1a1d23;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-light: #eff4ff;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --success: #16a34a;
+  --success-light: #f0fdf4;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Body. */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* Views -- only the active one is visible. */
+.view { display: none; }
+.view.active { display: block; }
