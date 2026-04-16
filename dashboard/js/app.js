@@ -4,6 +4,24 @@
 // Purpose: Entry point. Holds shared state and coordinates the other modules.
 //          Swap config.js to use this dashboard with a different project.
 
+// ── Mock Query Matcher ────────────────────────────────────────────────────────
+
+// Evaluates a MongoDB-style query against a single record.
+// Supports $or, $in, $gte, and $lte so rescue filters work on mock data.
+function matchesQuery(row, query) {
+  return Object.entries(query).every(([k, v]) => {
+    if (k === "$or") return v.some(q => matchesQuery(row, q));
+    if (typeof v === "object" && v !== null) {
+      const val = row[k];
+      if ("$in"  in v && !v.$in.includes(val)) return false;
+      if ("$gte" in v && !(val >= v.$gte))      return false;
+      if ("$lte" in v && !(val <= v.$lte))      return false;
+      return true;
+    }
+    return row[k] === v;
+  });
+}
+
 // ── Shared State ──────────────────────────────────────────────────────────────
 
 let allData      = [];    // Full dataset returned from the API.
@@ -97,10 +115,7 @@ async function loadData(query) {
   const start = performance.now();
 
   if (CONFIG.mockData) {
-    // Filter mock data locally using the same keys as the query.
-    allData = CONFIG.mockData.filter(row => {
-      return Object.entries(query).every(([k, v]) => row[k] === v);
-    });
+    allData = CONFIG.mockData.filter(row => matchesQuery(row, query));
   } else {
     try {
       allData = await api.filterAnimals(query);
