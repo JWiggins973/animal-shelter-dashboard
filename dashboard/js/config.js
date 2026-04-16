@@ -4,49 +4,52 @@
 //          This is the ONLY file that changes between projects.
 //          Everything else (app.js, index.html, style.css) is generic.
 //
-// ─────────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 // HOW TO USE THIS DASHBOARD FOR A NEW PROJECT
-// ─────────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 //
-// 1. Set api to the URL where your Flask server is running.
-// 2. Fill in title, subtitle, author, and logo for the header branding.
-// 3. Define columns -- one object per field. Set badge: true on the column
-//    you want rendered as a colored pill.
-// 4. Define filters -- each entry becomes a dropdown above the table.
-//    Provide a field name and the list of values to show as options.
-// 5. Define rescueFilters -- named MongoDB queries for the rescue dropdown.
-//    Always keep the first entry as { query: {} } to show all records.
-// 6. Set map.lat, map.lng, map.label, and map.name to your coordinate fields.
-// 7. Define addFields -- one entry per field on the Add Record form.
-//    Supported types: text, number, date, select (select requires options).
-// 8. Set deleteIdField to your primary key, deleteNameField to the display
-//    field, and deletePreview to the fields shown in each result card.
-// 9. Update messages to match your project's terminology.
+// 1. api: Flask server URL
+// 2. title, subtitle, author, logo: header branding
+// 3. columns: fields to show in the table (badge: true for colored pills)
+// 4. filters: dropdown filters above the table
+// 5. rescueFilters: named MongoDB queries (keep first entry as {})
+// 6. map: coordinate field names and default view
+// 7. addFields: fields on the Add Record form
+// 8. deleteIdField, deleteNameField, deletePreview: delete view config
+// 9. messages: toast text shown after actions
 //
-// ─────────────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
 
 const CONFIG = {
 
-  // ── API ────────────────────────────────────────────────────────────────────
+  // ------------------------------------------------------------
+  // API
+  // ------------------------------------------------------------
   // URL of the Flask server.
   api: "http://127.0.0.1:5000",
 
-  // ── Branding ───────────────────────────────────────────────────────────────
-  // Header text. logo can be any emoji or single character.
+  // ------------------------------------------------------------
+  // Branding
+  // ------------------------------------------------------------
+  // logo can be any emoji or single character.
   title:    "Grazioso Salvare",
   subtitle: "Animal Rescue Dashboard",
   author:   "Jermaine Wiggins",
   logo:     "🐾",
 
-  // ── Navigation ─────────────────────────────────────────────────────────────
-  // Nav buttons. view must match a .view div id in index.html.
+  // ------------------------------------------------------------
+  // Navigation
+  // ------------------------------------------------------------
+  // view must match a .view div id in index.html.
   nav: [
     { label: "Dashboard",     view: "dashboard" },
     { label: "Add Animal",    view: "add" },
     { label: "Delete Animal", view: "delete" },
   ],
 
-  // ── Labels ─────────────────────────────────────────────────────────────────
+  // ------------------------------------------------------------
+  // Labels
+  // ------------------------------------------------------------
   // Headings shown on each view.
   tableTitle:     "Animal Records",
   addTitle:       "Add Animal",
@@ -54,9 +57,10 @@ const CONFIG = {
   deleteTitle:    "Delete Animal",
   deleteSubtitle: "Search by name or animal ID to find and remove a record.",
 
-  // ── Table Columns ──────────────────────────────────────────────────────────
-  // One entry per column. field must match your MongoDB document field names.
-  // Set badge: true on one column to render its values as colored pills.
+  // ------------------------------------------------------------
+  // Table Columns
+  // ------------------------------------------------------------
+  // badge: true renders a column's values as colored pills.
   columns: [
     { label: "Name",       field: "name" },
     { label: "Type",       field: "animal_type",               badge: true },
@@ -68,8 +72,10 @@ const CONFIG = {
     { label: "DOB",        field: "date_of_birth" },
   ],
 
-  // ── Table Filters ──────────────────────────────────────────────────────────
-  // Dropdowns above the table. field must match a MongoDB field name.
+  // ------------------------------------------------------------
+  // Table Filters
+  // ------------------------------------------------------------
+  // field must match a MongoDB field name.
   filters: [
     {
       label:   "All Types",
@@ -88,8 +94,10 @@ const CONFIG = {
     },
   ],
 
-  // ── Rescue Filters ─────────────────────────────────────────────────────────
-  // Named MongoDB queries for the rescue dropdown. Keep the first entry as {}.
+  // ------------------------------------------------------------
+  // Rescue Filters
+  // ------------------------------------------------------------
+  // First entry must be { query: {} } to show all records.
   rescueFilters: [
     {
       label: "All Animals",
@@ -124,8 +132,10 @@ const CONFIG = {
     },
   ],
 
-  // ── Map ────────────────────────────────────────────────────────────────────
-  // lat and lng must match your MongoDB coordinate field names.
+  // ------------------------------------------------------------
+  // Map
+  // ------------------------------------------------------------
+  // lat and lng must match MongoDB field names.
   map: {
     lat:           "location_lat",
     lng:           "location_long",
@@ -136,15 +146,19 @@ const CONFIG = {
     defaultZoom:   10,
   },
 
-  // ── Chart ──────────────────────────────────────────────────────────────────
-  // field is the MongoDB field to group by for the pie chart.
+  // ------------------------------------------------------------
+  // Chart
+  // ------------------------------------------------------------
+  // field groups the pie chart.
   chart: {
     field: "breed",
     title: "Breed Distribution",
   },
 
-  // ── Add Form ───────────────────────────────────────────────────────────────
-  // Form fields. type: text | number | date | select (select requires options).
+  // ------------------------------------------------------------
+  // Add Form
+  // ------------------------------------------------------------
+  // type: text | number | date | select (select requires options).
   addFields: [
     { label: "Animal ID",        field: "animal_id",                 type: "text",   placeholder: "e.g. A123456" },
     { label: "Name",             field: "name",                      type: "text",   placeholder: "e.g. Luna" },
@@ -160,9 +174,10 @@ const CONFIG = {
     { label: "Age in Weeks",     field: "age_upon_outcome_in_weeks", type: "number", placeholder: "e.g. 21.7" },
   ],
 
-  // ── Delete ─────────────────────────────────────────────────────────────────
-  // deleteIdField: primary key sent to the API. deleteNameField: result card
-  // title. deleteSearch: searchable fields. deletePreview: card detail fields.
+  // ------------------------------------------------------------
+  // Delete
+  // ------------------------------------------------------------
+  // deleteIdField: primary key. deleteNameField: card title. deletePreview: card fields.
   deleteSearch:    ["name", "animal_id"],
   deleteIdField:   "animal_id",
   deleteNameField: "name",
@@ -173,7 +188,9 @@ const CONFIG = {
     { label: "ID",    field: "animal_id" },
   ],
 
-  // ── Messages ───────────────────────────────────────────────────────────────
+  // ------------------------------------------------------------
+  // Messages
+  // ------------------------------------------------------------
   // Toast messages shown after actions.
   messages: {
     addSuccess:    "Animal added successfully.",
@@ -181,8 +198,10 @@ const CONFIG = {
     deleteSuccess: "Animal record deleted successfully.",
   },
 
-  // ── Mock Data ──────────────────────────────────────────────────────────────
-  // Optional. Set to an array to use local data instead of fetching from the API.
+  // ------------------------------------------------------------
+  // Mock Data
+  // ------------------------------------------------------------
+  // Set to an array to use local data instead of the API.
   mockData: null,
 
 };

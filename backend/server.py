@@ -2,7 +2,7 @@
 # Author:   Jermaine Wiggins
 # Date:     2025
 # Purpose:  Flask server that exposes the animal shelter data as a REST API
-#           and serves the dashboard frontend. Routes handle HTTP only --
+#           and serves the dashboard frontend. Routes handle HTTP only and
 #           all database access goes through service.py.
 
 import os

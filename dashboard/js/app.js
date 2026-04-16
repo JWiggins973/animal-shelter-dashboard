@@ -4,7 +4,9 @@
 // Purpose: Entry point. Holds shared state and coordinates the other modules.
 //          Swap config.js to use this dashboard with a different project.
 
-// ── Mock Query Matcher ────────────────────────────────────────────────────────
+// ------------------------------------------------------------
+// Mock Query Matcher
+// ------------------------------------------------------------
 
 // Evaluates a MongoDB-style query against a single record so rescue filters work on mock data.
 function matchesQuery(row, query) {
@@ -21,7 +23,9 @@ function matchesQuery(row, query) {
   });
 }
 
-// ── Shared State ──────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
+// Shared State
+// ------------------------------------------------------------
 
 let allData      = [];    // Full dataset returned from the API.
 let filteredData = [];    // Data after table filters are applied.
@@ -32,7 +36,9 @@ let selectedRow  = 0;     // Which row is currently selected.
 
 const PAGE_SIZE  = 10;    // Rows per page.
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
+// Setup
+// ------------------------------------------------------------
 
 // Initializes everything once the page loads.
 document.addEventListener("DOMContentLoaded", () => {
@@ -45,7 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
   loadData({});
 });
 
-// ── Config ────────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
+// Config
+// ------------------------------------------------------------
 
 // Populates all CONFIG-driven text and nav buttons in the page.
 function applyConfig() {
@@ -77,7 +85,9 @@ function applyConfig() {
   });
 }
 
-// ── Data Loading ──────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
+// Data Loading
+// ------------------------------------------------------------
 
 // Loads total, dog, and cat counts into the stats bar.
 async function loadStats() {
@@ -135,7 +145,9 @@ async function loadData(query) {
   renderTable();
 }
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+// ------------------------------------------------------------
+// Utilities
+// ------------------------------------------------------------
 
 // Switches the active view.
 function showView(name, btn) {

@@ -29,18 +29,18 @@ test_animal = {
 }
 
 # ------------------------------------------------------------
-# Test create — insert one document, verify True returned
+# Test create
 # ------------------------------------------------------------
-print("--- Test: create ---")
+print("Test: create")
 result = shelter.create(test_animal)
 print(f"create returned: {result}")
 assert result == True, "create should return True"
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test read — query the document we just inserted
+# Test read
 # ------------------------------------------------------------
-print("--- Test: read ---")
+print("Test: read")
 results = shelter.read({"animal_id": "A999999"})
 print(f"read returned {len(results)} document(s)")
 assert len(results) == 1, "read should return 1 matching document"
@@ -48,27 +48,27 @@ assert results[0]["name"] == "Luna", "document name should be Luna"
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test read — query with no matches returns empty list
+# Test read with no match
 # ------------------------------------------------------------
-print("--- Test: read with no match ---")
+print("Test: read with no match")
 results = shelter.read({"animal_type": "fish"})
 print(f"read returned: {results}")
 assert results == [], "read with no match should return empty list"
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test count — verify count matches number of inserted docs
+# Test count
 # ------------------------------------------------------------
-print("--- Test: count ---")
+print("Test: count")
 count = shelter.count({"animal_id": "A999999"})
 print(f"count returned: {count}")
 assert count == 1, "count should return 1"
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test update — change color field, verify 1 doc modified
+# Test update
 # ------------------------------------------------------------
-print("--- Test: update ---")
+print("Test: update")
 modified = shelter.update({"animal_id": "A999999"}, {"$set": {"color": "White/Orange"}})
 print(f"update modified: {modified} document(s)")
 assert modified == 1, "update should modify 1 document"
@@ -79,9 +79,9 @@ assert updated[0]["color"] == "White/Orange", "color should be updated to White/
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test create_many — insert multiple documents at once
+# Test create_many
 # ------------------------------------------------------------
-print("--- Test: create_many ---")
+print("Test: create_many")
 test_animals = [
     {**test_animal, "rec_num": 999991, "animal_id": "A999991", "name": "Mochi"},
     {**test_animal, "rec_num": 999992, "animal_id": "A999992", "name": "Boba"},
@@ -96,9 +96,9 @@ assert count == 3, "create_many should have inserted 3 documents"
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test update_many — update all test batch documents at once
+# Test update_many
 # ------------------------------------------------------------
-print("--- Test: update_many ---")
+print("Test: update_many")
 modified = shelter.update_many(
     {"animal_id": {"$in": ["A999991", "A999992", "A999993"]}},
     {"$set": {"color": "Black/White"}},
@@ -108,9 +108,9 @@ assert modified == 3, "update_many should modify 3 documents"
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test delete — remove the original test document
+# Test delete
 # ------------------------------------------------------------
-print("--- Test: delete ---")
+print("Test: delete")
 deleted = shelter.delete({"animal_id": "A999999"})
 print(f"delete removed: {deleted} document(s)")
 assert deleted == 1, "delete should remove 1 document"
@@ -120,9 +120,9 @@ assert results == [], "document should no longer exist after delete"
 print("PASSED\n")
 
 # ------------------------------------------------------------
-# Test delete_many — remove all batch test documents
+# Test delete_many
 # ------------------------------------------------------------
-print("--- Test: delete_many ---")
+print("Test: delete_many")
 deleted = shelter.delete_many({"animal_id": {"$in": ["A999991", "A999992", "A999993"]}})
 print(f"delete_many removed: {deleted} document(s)")
 assert deleted == 3, "delete_many should remove 3 documents"
