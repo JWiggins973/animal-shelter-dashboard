@@ -125,9 +125,12 @@ async function loadData(query) {
     }
   }
 
-  // Show query time in the stats bar.
+  // Update stats bar to reflect the current filter.
   const elapsed = Math.round(performance.now() - start);
   document.getElementById("stat-query").textContent = `${elapsed}ms`;
+  document.getElementById("stat-total").textContent = allData.length.toLocaleString();
+  document.getElementById("stat-dogs").textContent  = allData.filter(r => r.animal_type === "Dog").length.toLocaleString();
+  document.getElementById("stat-cats").textContent  = allData.filter(r => r.animal_type === "Cat").length.toLocaleString();
 
   filteredData = [...allData];
   currentPage  = 1;
