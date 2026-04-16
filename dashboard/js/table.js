@@ -1,10 +1,9 @@
 // table.js
 // Author: Jermaine Wiggins
 // Date:   2025
-// Purpose: Table rendering, column sorting, and pagination.
-//          Reads shared state (filteredData, currentPage, etc.) from app.js.
+// Purpose: Table rendering, sorting, and pagination.
 
-// Builds the table headers from CONFIG.columns. Called once on page load.
+// Builds table headers from CONFIG.columns.
 function buildTableHead() {
   const thead = document.getElementById("table-head");
   const tr    = document.createElement("tr");
@@ -20,7 +19,7 @@ function buildTableHead() {
   thead.appendChild(tr);
 }
 
-// Renders the current page of rows into the table body.
+// Renders the current page into the table body.
 function renderTable() {
   const tbody = document.getElementById("table-body");
   const start = (currentPage - 1) * PAGE_SIZE;
@@ -74,7 +73,7 @@ function renderTable() {
   updateChart();
 }
 
-// Builds the page number buttons below the table.
+// Renders pagination controls below the table.
 function renderPagination() {
   const total      = Math.ceil(filteredData.length / PAGE_SIZE);
   const pagination = document.getElementById("pagination");
@@ -124,7 +123,7 @@ function renderPagination() {
   pagination.appendChild(next);
 }
 
-// Returns an array of page numbers to show, with "..." for skipped ranges.
+// Returns page numbers to display, with "..." for skipped ranges.
 function getPageRange(current, total) {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
   if (current <= 4) return [1, 2, 3, 4, 5, "...", total];
@@ -132,7 +131,7 @@ function getPageRange(current, total) {
   return [1, "...", current-1, current, current+1, "...", total];
 }
 
-// Jumps to a specific page.
+// Jumps to a page and scrolls to the top.
 function goToPage(page) {
   currentPage = page;
   selectedRow = 0;
@@ -140,7 +139,7 @@ function goToPage(page) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Sorts filteredData by the clicked column. Clicking the same column reverses direction.
+// Sorts by the clicked column; same column toggles direction.
 function sortTable(colIdx) {
   const ths = document.querySelectorAll("thead th");
 

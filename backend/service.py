@@ -8,8 +8,7 @@ from crudModule import AnimalShelter
 
 db = AnimalShelter()
 
-# Fields allowed in filter queries. Anything outside this set is stripped before
-# the query reaches MongoDB, which blocks operator injection attacks.
+# Only these fields are allowed in filter queries. Anything else is stripped to block operator injection.
 ALLOWED_FILTER_FIELDS = {
     "animal_type",
     "breed",
@@ -26,10 +25,7 @@ REQUIRED_CREATE_FIELDS = {"name", "animal_type", "breed"}
 
 
 def sanitize_query(query):
-    """Return a copy of query containing only keys in ALLOWED_FILTER_FIELDS.
-
-    Returns an empty dict if the input is not a dict.
-    """
+    """Strip keys not in ALLOWED_FILTER_FIELDS. Returns {} for non-dict input."""
     if not isinstance(query, dict):
         return {}
     return {k: v for k, v in query.items() if k in ALLOWED_FILTER_FIELDS}
@@ -44,14 +40,9 @@ def get_all_animals():
 
 
 def filter_animals(query):
-    """Return animals matching the sanitized query with _id fields converted to strings.
-
-    If the original query had keys but none survived sanitization, returns an empty
-    list rather than running an unfiltered query against the full collection.
-    """
+    """Return animals matching the sanitized query. _id fields are converted to strings."""
     clean = sanitize_query(query)
-    # If the caller sent a non-empty query but all keys were stripped (e.g. operator
-    # injection), return nothing instead of falling through to a full collection scan.
+    # Non-empty query with no valid keys likely means injection; return nothing.
     if query and not clean:
         return []
     docs = db.read(clean)

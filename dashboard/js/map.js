@@ -1,12 +1,12 @@
 // map.js
 // Author: Jermaine Wiggins
 // Date:   2025
-// Purpose: Leaflet map rendering. Updates the marker when a table row is selected.
+// Purpose: Leaflet map. Updates the marker when a table row is selected.
 
 let leafletMap    = null; // Leaflet map instance.
 let leafletMarker = null; // Current map marker.
 
-// Updates the Leaflet map to show the selected animal's location.
+// Moves the map marker to the selected row's coordinates.
 function updateMap(rowIdx) {
   const row = filteredData[rowIdx];
   if (!row) return;

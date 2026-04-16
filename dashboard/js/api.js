@@ -7,14 +7,14 @@
 
 const api = {
 
-  // Fetch total, dog, and cat counts.
+  // Returns total, dog, and cat counts.
   async getStats() {
     const res = await fetch(`${CONFIG.api}/api/animals/stats`);
     if (!res.ok) throw new Error("Failed to load stats");
     return res.json();
   },
 
-  // Fetch animals matching the given query. Pass {} to get all records.
+  // Returns animals matching the query. Pass {} to get all records.
   async filterAnimals(query = {}) {
     if (CONFIG.mockData) return CONFIG.mockData.filter(row => matchesQuery(row, query));
     const res = await fetch(`${CONFIG.api}/api/animals/filter`, {
@@ -26,7 +26,7 @@ const api = {
     return res.json();
   },
 
-  // Insert a new animal record. Returns { ok, data } -- never throws.
+  // Inserts a new animal record. Returns { ok, data }, never throws.
   async createAnimal(doc) {
     if (CONFIG.mockData) {
       CONFIG.mockData.push(doc);
@@ -41,7 +41,7 @@ const api = {
     return { ok: res.ok, data };
   },
 
-  // Delete the first animal matching the query. Returns { ok, data } -- never throws.
+  // Deletes the first animal matching the query. Returns { ok, data }, never throws.
   async deleteAnimal(query) {
     if (CONFIG.mockData) {
       const idx = CONFIG.mockData.findIndex(row => matchesQuery(row, query));

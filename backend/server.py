@@ -12,11 +12,11 @@ import service
 
 app = Flask(__name__, static_folder="../dashboard")
 
-# Restrict CORS to the configured origin instead of allowing all origins.
+# Restrict to the configured origin; defaults to localhost.
 ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "http://127.0.0.1:5000")
 CORS(app, origins=[ALLOWED_ORIGIN])
 
-# Run in debug mode only when FLASK_ENV=development is set in .env.
+# Debug mode only when FLASK_ENV=development.
 debug = os.environ.get("FLASK_ENV") == "development"
 
 

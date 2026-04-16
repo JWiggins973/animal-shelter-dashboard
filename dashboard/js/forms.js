@@ -3,7 +3,7 @@
 // Date:   2025
 // Purpose: Add animal form and delete animal search/confirm flow.
 
-// Builds the add animal form dynamically from CONFIG.addFields.
+// Builds the add form from CONFIG.addFields.
 function buildAddForm() {
   const form = document.getElementById("add-form");
 
@@ -39,7 +39,7 @@ function buildAddForm() {
   });
 }
 
-// Collects form values and posts a new record to the API.
+// Reads form values and submits a new animal record.
 async function submitAdd() {
   const doc = {};
 
@@ -61,7 +61,7 @@ async function submitAdd() {
   }
 }
 
-// Clears all add form inputs.
+// Clears the add form.
 function clearAddForm() {
   CONFIG.addFields.forEach(f => {
     const el = document.getElementById(`add-${f.field}`);
@@ -69,7 +69,7 @@ function clearAddForm() {
   });
 }
 
-// Searches for animals matching the input and displays result cards.
+// Searches for matching animals and renders result cards.
 async function searchDelete() {
   const val     = document.getElementById("delete-search").value.trim();
   const results = document.getElementById("delete-results");
@@ -147,7 +147,7 @@ async function searchDelete() {
   });
 }
 
-// Sends a delete request to the API and removes the result card on success.
+// Deletes the animal and removes the card on success.
 async function confirmDelete(animalId, btn) {
   const { ok, data } = await api.deleteAnimal({ [CONFIG.deleteIdField]: animalId });
   if (ok && data.deleted > 0) {
