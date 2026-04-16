@@ -6,8 +6,7 @@
 
 // ── Mock Query Matcher ────────────────────────────────────────────────────────
 
-// Evaluates a MongoDB-style query against a single record.
-// Supports $or, $in, $gte, and $lte so rescue filters work on mock data.
+// Matches a row against a MongoDB-style query. Supports $or, $in, $gte, and $lte.
 function matchesQuery(row, query) {
   return Object.entries(query).every(([k, v]) => {
     if (k === "$or") return v.some(q => matchesQuery(row, q));
@@ -35,7 +34,7 @@ const PAGE_SIZE  = 10;    // Rows per page.
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
-// Builds everything from CONFIG once the page loads.
+// Initializes everything once the page loads.
 document.addEventListener("DOMContentLoaded", () => {
   applyConfig();
   buildTableHead();
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-// Fills in all the empty placeholders in index.html from CONFIG.
+// Populates all CONFIG-driven text and nav buttons in the page.
 function applyConfig() {
   document.getElementById("page-title").textContent      = CONFIG.title;
   document.getElementById("header-logo").textContent     = CONFIG.logo;
@@ -80,8 +79,7 @@ function applyConfig() {
 
 // ── Data Loading ──────────────────────────────────────────────────────────────
 
-// Fetches total, dog, and cat counts and updates the stats bar.
-// When mockData is set, computes counts locally instead of hitting the API.
+// Loads total, dog, and cat counts into the stats bar.
 async function loadStats() {
   let total, dogs, cats;
 
@@ -106,8 +104,7 @@ async function loadStats() {
   document.getElementById("stat-cats").textContent  = cats.toLocaleString();
 }
 
-// Fetches animals matching the query and times the request.
-// When mockData is set, filters locally instead of hitting the API.
+// Loads animals matching the query, times the request, and refreshes the table.
 async function loadData(query) {
   document.getElementById("table-body").innerHTML =
     `<tr><td colspan="${CONFIG.columns.length}" class="loading">Loading...</td></tr>`;
@@ -140,7 +137,7 @@ async function loadData(query) {
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
-// Switches between dashboard, add, and delete views.
+// Switches the active view.
 function showView(name, btn) {
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
@@ -153,7 +150,7 @@ function showView(name, btn) {
   }
 }
 
-// Shows a toast message and hides it after 3 seconds.
+// Shows a toast for 3 seconds.
 function showToast(id) {
   const el = document.getElementById(id);
   if (!el) return;

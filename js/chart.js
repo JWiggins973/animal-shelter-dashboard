@@ -5,8 +5,8 @@
 
 let pieChart = null; // Chart.js instance.
 
-// Builds a pie chart from filteredData, grouped by CONFIG.chart.field.
-// Values under 1% of the total are grouped into an Other slice.
+// Rebuilds the doughnut chart from filteredData, grouped by CONFIG.chart.field.
+// Slices under 1% are grouped into Other.
 function updateChart() {
   const field  = CONFIG.chart.field;
   const counts = {};

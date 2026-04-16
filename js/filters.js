@@ -14,7 +14,7 @@ function buildRescueFilter() {
   });
 }
 
-// Called when the rescue dropdown changes. Clears table filters and reloads data.
+// Runs when the rescue dropdown changes; clears table filters and reloads data.
 async function applyRescueFilter() {
   const idx   = parseInt(document.getElementById("rescue-filter").value);
   const query = CONFIG.rescueFilters[idx].query;
@@ -22,7 +22,7 @@ async function applyRescueFilter() {
   await loadData(query);
 }
 
-// Builds the filter dropdowns from CONFIG.filters. Called once on page load.
+// Builds column filter dropdowns from CONFIG.filters.
 function buildFilterDropdowns() {
   const container = document.getElementById("filter-dropdowns");
 
@@ -50,7 +50,7 @@ function buildFilterDropdowns() {
   });
 }
 
-// Filters allData based on the search input and dropdown selections.
+// Filters allData using the search input and dropdown selections.
 function applyTableFilters() {
   const search  = document.getElementById("table-search").value.toLowerCase();
   const selects = document.querySelectorAll("#filter-dropdowns .tbl-filter");
